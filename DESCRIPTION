@@ -1,0 +1,17 @@
+Package: mlmfe
+Title: Bias-corrected Multilevel Models, Fixed Effects Models, and Regularized Fixed Effects Models
+Version: 0.0.0.9000
+Authors@R: 
+    person("Leonard", "Wainstein", email = "lwainstein@reed.edu", role = c("aut", "cre"))
+Description: This package implements bias-corrected multilevel models, fixed effects models, and (bias-corrected) regularized fixed effects models, as described in Bai et al. (2025) and Hazlett and Wainstein (2022). 
+License: GPL (>= 3)
+Imports: 
+    lme4,
+    Matrix,
+    sandwich
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 2.10)
+LazyData: true

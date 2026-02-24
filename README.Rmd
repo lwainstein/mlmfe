@@ -1,0 +1,487 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+options(width = 300)
+library(dplyr)
+library(lme4)
+library(mlmfe)
+
+set.seed(1)
+```
+
+
+
+# mlmfe
+
+Please contact Leonard Wainstein (lwainstein@reed.edu) with questions.
+
+## Overview
+
+The `mlmfe` package implements bias-corrected multilevel models (bcMLM), fixed effects models (FE), regularized fixed effects models (RegFE), and bias-corrected RegFE models (bcRegFE) as
+recommended by [Bai et al. (2025)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980).
+
+To demonstrate the functions included in `mlmfe`, we provide the following tutorial through an application to 
+a simulated, mock dataset that is included in the `mlmfe` package. While the data is simulated,
+it is meant to mimic the setting and certain characteristics of the data analyzed by [Wainstein et al. (2023a)](https://laeri.luskin.ucla.edu/12thgrademathandcollegeaccess/) and [Wainstein et al. (2023b)](https://laeri.luskin.ucla.edu/12thgrademathandcollegesuccess/), for the [Los Angeles Education Research Institute (LAERI)](https://laeri.luskin.ucla.edu/) at the University of California Los Angeles, who investigated the effects of taking math in 12th grade on end-of-high school and college outcomes in the Los Angeles Unified School District. This real data will be re-analyzed by [Bai et al. (2025)](https://arxiv.org/abs/2411.01723) in an upcoming version of their paper, and this README is meant to replicate their re-analysis on simulated, mock data.
+
+Finally, note that the `mlmfe` package **currently** only allows for two-level models.
+
+## Installation
+
+You can install the development version of `mlmfe` from [GitHub](https://github.com/) with:
+
+```{r, echo=TRUE, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("lwainstein/mlmfe")
+```
+
+## Data
+
+One can access the data for this README through the `mlmfe` package with:
+```{r}
+data(mockmath12th) 
+```
+
+Taking a look at the data,
+
+```{r}
+dplyr::glimpse(mockmath12th) # To read more about the dataset, type help(mockmath12th) into the R Console.
+```
+
+we see the data has 11,225 rows (which represent students) and 10 columns:
+
+- `finalgpa` (Outcome variable): Cumulative GPA at the end of high school.
+- `cenrl` (Outcome variable): Whether or not student enrolled in a two-year or four-year college within one year of highschool graduation (1=yes, 0=no).
+- `ccred` (Outcome variable): Number of credits accumulated in college after two years. Is `NA` if `cenrl=0`.
+- `tookmath` (Treatment variable): Whether or not student took math in 12th grade (1=yes, 0=no).
+- `school` (Covariate): School student attended (numbered 1-200).
+- `female` (Covariate): Whether or not student is female (1=yes, 0=no).
+- `ethnic` (Covariate): Race/Ethnicity of the student.
+- `frl` (Covariate): Whether or not student qualifies for free or reducted price lunch (1=yes, 0=no).
+- `gpa11th` (Covariate): Cumulative GPA at the end of 11th grade.
+- `mathtestz` (Covariate): Math standardized test score (Z-Score).
+
+
+In this applied example, we will use the modeling functions in the `mlmfe` package to estimate the effect of taking math in 12th grade (`tookmath`) on three outcomes: (1) cumulative GPA at the end of high school (`finalgpa`); (2) whether or not a student enrolled in a two-year or four-year college within one year of high school graduation (`cenrl`); and (3) number of credits accumulated in college after two years (`ccred`). In the data generating process for the simulated `mockmath12th` data, whether or not a student takes math in 12th grade depends heavily on what school the student goes to (e.g., perhaps certain schools offer more math classes than others) and students' grades and math skills. Thus, when teasing out the relationships between 12th grade math and the outcomes here, it will be key to account for student characteristics (`female`, `ethnic`, `frl`, `gpa11th`, and `mathtestz`) and school (`school`) in our models for the outcomes. (Note that the simulated demographic variables (gender, race/ethnicity, and a free or reduced-price lunch indicator) were generated completely at random, and do *not* have any relationship with other variables in the data (e.g., the outcomes, math course-taking, school, or academic achievement) --- these demographic variables are included purely to simulate the experience of working with an education-related dataset, as these variables are often information collected on students.)
+
+## Functions
+
+
+The `mlmfe` package has four modeling functions:
+
+  - `bcmlm()`: Bias-corrected multilevel models (bcMLM)
+
+  - `fe()`: Fixed effects models (FE)
+
+  - `regfe()`: Regularized fixed effects models (RegFE)
+  
+  - `bcregfe()`: Bias-corrected regularized fixed effects models (bcRegFE)
+
+At a minimum, these functions require (i) a dataset to analyze, and (ii) an `R` formula in the style of the [`lme4`](https://cran.r-project.org/web/packages/lme4/index.html) package, which implements multilevel models (the `bcmlm()`, `regfe()`, and `bcregfe()` functions in `mlmfe` all rely on the `lme4` package to fit (preliminary) multilevel models). For example, the following code creates a linear bcMLM for `finalgpa`:
+```{r}
+model <- bcmlm(
+  formula = finalgpa ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th
+)
+```
+In the above code, the formula `finalgpa ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school)` indicates that:
+
+- The outcome variable is `finalgpa`.
+
+- The regressors are `tookmath`, `female`, `ethnic`, `frl`, `mathtestz`, and `gpa11th`.
+
+- By specifying `+ (1 | school)`, we are allowing varying intercepts (`1`) by `school`. Were we to include, for example, a varying slope for `mathtestz`, we would instead specify `+ (1 + mathtestz | school)`.
+
+By default, the modeling functions in the `mlmfe` package produce linear models. However, this can be changed by specifying the `family` argument for `bcmlm()` and `fe()`, and the `regression_type` argument for `regfe()` and `bcregfe()`. The `bcmlm()` and `fe()` functions also allow for different methods of estimating standard errors for the model, by specifying the `inference` argument. The `regfe()` and `bcregfe()` functions only allow for cluster-robust standard errors, as described in [Bai et al. (2025)](https://arxiv.org/abs/2411.01723). 
+
+We demonstrate these functions below, but note that `help()` files are also available for these functions with:
+
+```{r, eval=F}
+help(bcmlm)
+help(fe)
+help(regfe)
+help(bcregfe)
+```
+
+
+### Outcome 1: `finalgpa`
+
+We first investigate the relationship, in this simulated dataset, between 12th grade math course-taking (`tookmath`) and cumulative GPA at the end of high school (`finalgpa`). Because `finalgpa` is a continuous variable (taking any value from 0-4), we will use linear models for this outcome.
+
+We first estimate a bcMLM using the `bcmlm()` function, and estimate standard errors with cluster-robust standard errors by setting `inference="crse"`:
+```{r}
+bcmlm_model <- bcmlm(
+  formula = finalgpa ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  inference = "crse"
+)
+```
+We can view the estimated coefficients, along with their estimated standard errors and p-values, with:
+```{r}
+bcmlm_model$coefficients
+```
+The bcMLM estimates that, in this mock setting, taking math in 12th grade decreases one's cumulative end-of-high school GPA by about -0.04 GPA points, on average. (This is about what [Wainstein et al. (2023a)](https://laeri.luskin.ucla.edu/12thgrademathandcollegeaccess/) estimated in their real setting for a subset of the students they examined.) Additionally, this estimate is statistically significant at many of the usual thresholds (e.g., 0.05, 0.01, and 0.001), with a minuscule p-value. 
+
+Note that the `bcmlm()` function has created extra regressors than were specified in the formula for the function call: the variables with the suffix `_schoolmean`. Because the bcMLM only has school-varying intercepts, these new variables are the school-level averages of *all* the original regressors (including the required indicator variables needed for the `ethnic` categorical/factor variable). Were one to implement bcMLM from scratch with the `lme4` package, one would need to create these variables themselves, like so:
+```{r}
+# Read in the "dplyr" package -- we will use it to wrangle the data
+library(dplyr)
+
+# First make race/ethnicity indicator variables, and start a new dataset: data_new
+data_new <- mockmath12th %>%
+  mutate(
+    ethnicBlack = 1*(ethnic=="Black"),
+    ethnicFilipinx = 1*(ethnic=="Filipinx"),
+    ethnicLatinx = 1*(ethnic=="Latinx"),
+    ethnicWhite = 1*(ethnic=="White"),
+    ethnicOther = 1*(ethnic=="Other"),
+  ) # Here, Asian is the "held out" group for the indicator variables.
+
+# Calculate school-level averages, and add them to data_new
+school_means <- data_new %>%
+  group_by(school) %>%
+  summarize(
+    tookmath_schoolmean = mean(tookmath),
+    female_schoolmean = mean(female),
+    ethnicBlack_schoolmean = mean(ethnicBlack),
+    ethnicFilipinx_schoolmean = mean(ethnicFilipinx),
+    ethnicLatinx_schoolmean = mean(ethnicLatinx),
+    ethnicWhite_schoolmean = mean(ethnicWhite),
+    ethnicOther_schoolmean = mean(ethnicOther),
+    frl_schoolmean = mean(frl),
+    mathtestz_schoolmean = mean(mathtestz),
+    gpa11th_schoolmean = mean(gpa11th)
+  )
+data_new <- merge(data_new, school_means)
+  
+# Fit model with lme4
+manual_bcmlm <- lmer(
+  formula = finalgpa ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  tookmath_schoolmean + female_schoolmean + ethnicBlack_schoolmean + ethnicFilipinx_schoolmean + ethnicLatinx_schoolmean + ethnicWhite_schoolmean + ethnicOther_schoolmean + frl_schoolmean + mathtestz_schoolmean + gpa11th_schoolmean + (1 | school),
+  data = data_new
+)
+```
+We can see that the coefficient estimates from `manual_bcmlm` are exactly the same as from the `bcmlm()` function:
+```{r}
+comparison <- cbind(
+  bcmlm_model$coefficients[, "Estimate"], 
+  summary(manual_bcmlm)$coefficients[, "Estimate"]
+)
+colnames(comparison) <- c("bcMLM - function", "bcMLM - manual")
+comparison
+```
+However, fitting the model by scratch is much more work! And this gets more complicated with more school-varying coefficients (see [Bai et al. (2025)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980)). Meanwhile, with `bcmlm()`, these are automatically added. For example, the following function call creates a bcMLM with school-varying intercepts *and* slopes for `mathtestz`:
+```{r}
+bcmlm_model_slopes <- bcmlm(
+  formula = finalgpa ~ tookmath + female + ethnic + frl + mathtestz + gpa11th + (1 + mathtestz | school), 
+  data = mockmath12th,
+  inference = "crse"
+)
+bcmlm_model_slopes$coefficients
+```
+Here, the added variables are the variables with the `_tilde` suffix, echoing the notation in [Bai et al. (2025)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980).
+
+
+Finally, as [Hazlett and Wainstein (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980) note, for linear models, the coefficient estimates and cluster-robust standard errors from a bcMLM and the corresponding FE model should coincide. To confirm this, we estimate a FE model with the `fe()` function:
+```{r}
+fe_model <- fe(
+  formula = finalgpa ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  inference = "crse"
+)
+```
+As expected, we see that the models' coefficients (that they share) are exactly equal:
+```{r}
+coef_comparison <- as.matrix(bcmlm_model$coefficients[, "Estimate"])
+coef_comparison <- cbind(
+  coef_comparison, 
+  (fe_model$coefficients[, "Estimate"])[names(bcmlm_model$coefficients[, "Estimate"])]
+)
+colnames(coef_comparison) <- c("bcMLM", "FE")
+coef_comparison
+```
+as are the cluster-robust standard errors:
+```{r}
+se_comparison <- as.matrix(bcmlm_model$coefficients[, "Std. Error"])
+se_comparison <- cbind(
+  se_comparison, 
+  (fe_model$coefficients[, "Std. Error"])[names(bcmlm_model$coefficients[, "Std. Error"])]
+)
+colnames(se_comparison) <- c("bcMLM", "FE")
+se_comparison
+```
+
+
+
+### Outcome 2: `cenrl`
+
+Next, we investigate the relationship, in this simulated dataset, between `tookmath` and enrolling in a 2-year or 4-year college within one year of graduating high school (`cenrl`). Because `cenrl` is a binary variable (0=no, 1=yes), we use logistic regression for this outcome. We compare results across five models:
+
+- FE, with `fe()`
+
+- bcMLM, with `bcmlm()`
+
+- bcRegFE, with `bcregfe()`
+
+- RegFE, with `regfe()`
+
+- Uncorrected multilevel model (MLM), with `glmer()` from the `lme4` package
+ 
+Because `school` influences both `tookmath` and the outcomes, we should expect that the uncorrected RegFE model and the uncorrected MLM should show bias, even in a finite sample. Meanwhile FE, bcMLM, and bcRegFE should be closer to the truth. 
+
+We fit the FE and bcMLM logistic regression models similarly to how the linear models were fit for the `finalgpa` outcome, except we now specify `family = binomial(link="logit")`:
+```{r, echo=T, eval=F}
+bcmlm_model <- bcmlm(
+  formula = cenrl ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = binomial(link="logit"),
+  inference = "boot",
+  B=200
+)
+fe_model <- fe(
+  formula = cenrl ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = binomial(link="logit"),
+  inference = "crse"
+)
+```
+```{r, echo=F, eval=T}
+bcmlm_model <- bcmlm(
+  formula = cenrl ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = binomial(link="logit"),
+  inference = "default"
+)
+fe_model <- fe(
+  formula = cenrl ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = binomial(link="logit"),
+  inference = "crse"
+)
+```
+We apply a cluster bootstrap (with `B=200` bootstrap samples) for inference with the bcMLM (with `inference="boot"`) and cluster-robust standard errors for the FE model (`inference="crse"`). To fit the RegFE and bcRegFE models, we run:
+```{r}
+bcregfe_model <- bcregfe(
+  formula = cenrl ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  regression_type = "logistic"
+)
+regfe_model <- regfe(
+  formula = cenrl ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  regression_type = "logistic"
+)
+```
+Note that we specify logistic regression with `regression_type = "logistic"` with both `regfe()` and `bcregfe()`. By default, these functions apply cluster-robust standard errors for inference. Finally, we can fit the uncorrected MLM with:
+```{r}
+mlm_model <- glmer( # from lme4
+  formula = cenrl ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = binomial(link="logit")
+)
+```
+Below is a table that compares the estimated coefficients from each model, where double stars (**) indicate statistical significance at the 0.05 level:
+```{r, echo=F}
+# Make results comparison table
+bcmlm_beta <- bcmlm_model$coefficients[, "Estimate"]
+
+results <- as.matrix(bcmlm_model$coefficients[, "Estimate"])
+results <- cbind(results, (fe_model$coefficients[, "Estimate"])[names(bcmlm_beta)])
+results <- cbind(results, bcregfe_model$coefficients[names(bcmlm_beta), "Estimate"])
+results <- cbind(results, (regfe_model$coefficients[, "Estimate"])[names(bcmlm_beta)])
+results <- cbind(results, summary(mlm_model)$coefficients[, "Estimate"][names(bcmlm_beta)])
+colnames(results) <- c("bcMLM", "FE", "bcRegFE", "RegFE", "MLM")
+results <- results[, c("FE", "bcMLM", "bcRegFE", "MLM", "RegFE")]
+
+se_mat <- as.matrix(bcmlm_model$coefficients[, "Std. Error"])
+se_mat <- cbind(se_mat, (fe_model$coefficients[, "Std. Error"])[names(bcmlm_beta)])
+se_mat <- cbind(se_mat, bcregfe_model$coefficients[names(bcmlm_beta), "Std. Error"])
+se_mat <- cbind(se_mat, (regfe_model$coefficients[, "Std. Error"])[names(bcmlm_beta)])
+se_mat <- cbind(se_mat, summary(mlm_model)$coefficients[, "Std. Error"][names(bcmlm_beta)])
+colnames(se_mat) <- c("bcMLM", "FE", "bcRegFE", "RegFE", "MLM")
+se_mat <- se_mat[, c("FE", "bcMLM", "bcRegFE", "MLM", "RegFE")]
+
+coverage_mat <- (0 >= results-qnorm(0.975)*se_mat) & (0 <= results+qnorm(0.975)*se_mat)
+
+results <- round(results, 4)
+se_mat <- round(se_mat, 4)
+results <- data.frame(results)
+se_mat <- data.frame(se_mat)
+
+for(i in 1:ncol(results)){
+  old_vec <- results[, i]
+  
+  star_vector <- rep("**", nrow(results))
+  star_vector[is.na(coverage_mat[, i])] <- ""
+  star_vector[coverage_mat[, i]==TRUE] <- ""
+  
+  results[, i] <- paste(
+    as.character(sprintf("%.4f", results[, i])), 
+    star_vector, 
+    " (", 
+    as.character(sprintf("%.4f", se_mat[, i])),
+    ")",
+    sep=""
+  )
+  results[is.na(old_vec), i] <- NA
+}
+
+cenrl_results <- results
+cenrl_results
+```
+All models estimate that `tookmath` has a positive, and statistically significant, relationship with `cenrl`. The FE, bcMLM, and bcRegFE models all produce similar coefficients and standard errors. However, the RegFE and uncorrected MLM produce noticeably larger estimates. In fact, because the data is simulated, the true coefficient on `tookmath` is known, and is 0.375, which MLM and RegFE are much further from (i.e., are more biased) than are FE, bcMLM, and bcRegFE. (The coefficient of 0.375 was chosen because it results in an effect of 12th grade math course-taking of about +4.9 percentage points more likely to enroll in college, as was estimated by [Wainstein et al. (2023a)](https://laeri.luskin.ucla.edu/12thgrademathandcollegeaccess/) for a subset of students in their real study.)
+
+
+
+### Outcome 3: `ccred`
+
+Next, we investigate the relationship, in this mock dataset, between `tookmath` and college credits accumulated two years into college (`ccred`). Because `cenrl` is a count variable here, only taking positive integer values, we will use poisson regression for this outcome. We again compare results across five models:
+
+- FE, with `fe()`
+
+- bcMLM, with `bcmlm()`
+
+- bcRegFE, with `bcregfe()`
+
+- RegFE, with `regfe()`
+
+- Uncorrected multilevel model (MLM), with `glmer()` from the `lme4` package
+
+The following code runs these models, requiring changes to the `family` argument for `bcmlm()`, `fe()`, and `glmer()` (from `lme4`), and the `regression_type` argument for `regfe()` and `bcregfe()`:
+```{r, echo=T, eval=F}
+bcmlm_model <- bcmlm(
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = poisson(link="log"),
+  inference = "boot",
+  B = 200
+)
+fe_model <- fe(
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = poisson(link="log"),
+  inference = "crse"
+)
+bcregfe_model <- bcregfe(
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  regression_type = "poisson"
+)
+regfe_model <- regfe(
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  regression_type = "poisson"
+)
+mlm_model <- glmer( # from lme4
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = poisson(link="log")
+)
+```
+```{r, echo=F, eval=T}
+bcmlm_model <- bcmlm(
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = poisson(link="log"),
+  inference = "default"
+)
+fe_model <- fe(
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = poisson(link="log"),
+  inference = "crse"
+)
+bcregfe_model <- bcregfe(
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  regression_type = "poisson"
+)
+regfe_model <- regfe(
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  regression_type = "poisson"
+)
+mlm_model <- glmer( # from lme4
+  formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
+  data = mockmath12th,
+  family = poisson(link="log")
+)
+```
+The following table then compares the estimated coefficients (and standard errors) across the five models, with double stars (**) indicating statistical significance at the 0.05 level:
+```{r, echo=F}
+# Make results comparison table
+bcmlm_beta <- bcmlm_model$coefficients[, "Estimate"]
+
+results <- as.matrix(bcmlm_model$coefficients[, "Estimate"])
+results <- cbind(results, (fe_model$coefficients[, "Estimate"])[names(bcmlm_beta)])
+results <- cbind(results, bcregfe_model$coefficients[names(bcmlm_beta), "Estimate"])
+results <- cbind(results, (regfe_model$coefficients[, "Estimate"])[names(bcmlm_beta)])
+results <- cbind(results, summary(mlm_model)$coefficients[, "Estimate"][names(bcmlm_beta)])
+colnames(results) <- c("bcMLM", "FE", "bcRegFE", "RegFE", "MLM")
+results <- results[, c("FE", "bcMLM", "bcRegFE", "MLM", "RegFE")]
+
+se_mat <- as.matrix(bcmlm_model$coefficients[, "Std. Error"])
+se_mat <- cbind(se_mat, (fe_model$coefficients[, "Std. Error"])[names(bcmlm_beta)])
+se_mat <- cbind(se_mat, bcregfe_model$coefficients[names(bcmlm_beta), "Std. Error"])
+se_mat <- cbind(se_mat, (regfe_model$coefficients[, "Std. Error"])[names(bcmlm_beta)])
+se_mat <- cbind(se_mat, summary(mlm_model)$coefficients[, "Std. Error"][names(bcmlm_beta)])
+colnames(se_mat) <- c("bcMLM", "FE", "bcRegFE", "RegFE", "MLM")
+se_mat <- se_mat[, c("FE", "bcMLM", "bcRegFE", "MLM", "RegFE")]
+
+coverage_mat <- (0 >= results-qnorm(0.975)*se_mat) & (0 <= results+qnorm(0.975)*se_mat)
+
+results <- round(results, 4)
+se_mat <- round(se_mat, 4)
+results <- data.frame(results)
+se_mat <- data.frame(se_mat)
+
+for(i in 1:ncol(results)){
+  old_vec <- results[, i]
+  
+  star_vector <- rep("**", nrow(results))
+  star_vector[is.na(coverage_mat[, i])] <- ""
+  star_vector[coverage_mat[, i]==TRUE] <- ""
+  
+  results[, i] <- paste(
+    as.character(sprintf("%.4f", results[, i])), 
+    star_vector, 
+    " (", 
+    as.character(sprintf("%.4f", se_mat[, i])),
+    ")",
+    sep=""
+  )
+  results[is.na(old_vec), i] <- NA
+}
+
+ccred_results <- results
+ccred_results
+```
+All models estimate that `tookmath` does *not* have a statistically significant relationship with `ccred`, and the coefficients are small. Again, the FE, bcMLM, and bcRegFE models all produce similar coefficients and standard errors. The RegFE and uncorrected MLM produce slightly larger estimates, but they are still small like the other three models. In truth, the data is simulated such that `tookmath` has no relationship with `ccred` (i.e., the true coefficient is 0). (An effect of 0 was chosen because [Wainstein et al. (2023b)](https://laeri.luskin.ucla.edu/12thgrademathandcollegesuccess/) did not find a statistically significant relationship between 12th grade math and overall college credits for a subset of students in their real study.) Thus all models correctly imply that there is little to no relationship between these variables, after accounting for student characteristics and school.
+
+
+
+
+
+## References
+
+Bai, H., Ferguson, A., Wainstein, L., & Wells, J. (2025). Comparing multilevel and fixed 
+effect approaches in the generalized linear model setting. *arXiv preprint arXiv:2411.01723*. 
+
+Hazlett, C. & Wainstein, L. (2022). Understanding, Choosing, and Unifying Multilevel and Fixed 
+Effect Approaches. *Political Analysis, 30*(1), 46-65. doi:10.1017/pan.2020.41
+
+Wainstein, L., Miller, C., Phillips, M., Yamashiro, K., & Melguizo, T. (2023a). Twelfth Grade Math and College Access. Los Angeles Education Research Institute, Los Angeles, CA, USA. [https://laeri.luskin.ucla.edu/12thgrademathandcollegeaccess/](https://laeri.luskin.ucla.edu/12thgrademathandcollegeaccess/).
+
+Wainstein, L., Miller, C., Phillips, M., Yamashiro, K., & Melguizo, T. (2023b). Twelfth Grade Math and College Success. Los Angeles Education Research Institute, Los Angeles, CA, USA. [https://laeri.luskin.ucla.edu/12thgrademathandcollegesuccess/](https://laeri.luskin.ucla.edu/12thgrademathandcollegesuccess/).
+
+
+
