@@ -239,6 +239,10 @@ Next, we investigate the relationship, in this simulated dataset, between `tookm
 Because `school` influences both `tookmath` and the outcomes, we should expect that the uncorrected RegFE model and the uncorrected MLM should show bias, even in a finite sample. Meanwhile FE, bcMLM, and bcRegFE should be closer to the truth. 
 
 We fit the FE and bcMLM logistic regression models similarly to how the linear models were fit for the `finalgpa` outcome, except we now specify `family = binomial(link="logit")`:
+```{r, echo=F, eval=T}
+# Set seed for bootstrap
+set.seed(1)
+```
 ```{r, echo=T, eval=F}
 bcmlm_model <- bcmlm(
   formula = cenrl ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
@@ -310,6 +314,28 @@ se_mat <- cbind(se_mat, summary(mlm_model)$coefficients[, "Std. Error"][names(bc
 colnames(se_mat) <- c("bcMLM", "FE", "bcRegFE", "RegFE", "MLM")
 se_mat <- se_mat[, c("FE", "bcMLM", "bcRegFE", "MLM", "RegFE")]
 
+se_mat["(Intercept)", "bcMLM"] <-  3.75584920128985
+se_mat["tookmath", "bcMLM"] <-  0.0570871398941432
+se_mat["female", "bcMLM"] <-  0.0660592922493285
+se_mat["ethnicBlack", "bcMLM"] <-  0.175628209803759
+se_mat["ethnicFilipinx", "bcMLM"] <-  0.208917810966184
+se_mat["ethnicLatinx", "bcMLM"] <-  0.147618367762705
+se_mat["ethnicWhite", "bcMLM"] <-  0.157080480377284
+se_mat["ethnicOther", "bcMLM"] <-  0.301122923926471
+se_mat["frl", "bcMLM"] <-  0.113775900945418
+se_mat["mathtestz", "bcMLM"] <-  0.0569370924726535
+se_mat["gpa11th", "bcMLM"] <-  0.102313754626746
+se_mat["tookmath_schoolmean", "bcMLM"] <-  0.200734450243744
+se_mat["female_schoolmean", "bcMLM"] <-  0.605207013540379
+se_mat["ethnicBlack_schoolmean", "bcMLM"] <-  1.44005375741623
+se_mat["ethnicFilipinx_schoolmean", "bcMLM"] <-  1.59983573444659
+se_mat["ethnicLatinx_schoolmean", "bcMLM"] <-  1.25453591473223
+se_mat["ethnicWhite_schoolmean", "bcMLM"] <-  1.31820595282305
+se_mat["ethnicOther_schoolmean", "bcMLM"] <-  3.31377729995806
+se_mat["frl_schoolmean", "bcMLM"] <-  0.912875650266217
+se_mat["mathtestz_schoolmean", "bcMLM"] <-  0.580916107990865
+se_mat["gpa11th_schoolmean", "bcMLM"] <-  1.12770285901502
+
 coverage_mat <- (0 >= results-qnorm(0.975)*se_mat) & (0 <= results+qnorm(0.975)*se_mat)
 
 results <- round(results, 4)
@@ -332,7 +358,7 @@ for(i in 1:ncol(results)){
     ")",
     sep=""
   )
-  results[is.na(old_vec), i] <- NA
+  results[is.na(old_vec), i] <- ""
 }
 
 cenrl_results <- results
@@ -357,6 +383,10 @@ Next, we investigate the relationship, in this mock dataset, between `tookmath` 
 - Uncorrected multilevel model (MLM), with `glmer()` from the `lme4` package
 
 The following code runs these models, requiring changes to the `family` argument for `bcmlm()`, `fe()`, and `glmer()` (from `lme4`), and the `regression_type` argument for `regfe()` and `bcregfe()`:
+```{r, echo=F, eval=T}
+# Set seed for bootstrap
+set.seed(1)
+```
 ```{r, echo=T, eval=F}
 bcmlm_model <- bcmlm(
   formula = ccred ~ tookmath + female + ethnic + frl + mathtestz + gpa11th +  (1 | school), 
@@ -437,6 +467,28 @@ se_mat <- cbind(se_mat, summary(mlm_model)$coefficients[, "Std. Error"][names(bc
 colnames(se_mat) <- c("bcMLM", "FE", "bcRegFE", "RegFE", "MLM")
 se_mat <- se_mat[, c("FE", "bcMLM", "bcRegFE", "MLM", "RegFE")]
 
+se_mat["(Intercept)", "bcMLM"] <- 1.11284567144083
+se_mat["tookmath", "bcMLM"] <- 0.00561061047020248
+se_mat["female", "bcMLM"] <- 0.00425496730223132
+se_mat["ethnicBlack", "bcMLM"] <- 0.013722043456866
+se_mat["ethnicFilipinx", "bcMLM"] <- 0.0156378834591232
+se_mat["ethnicLatinx", "bcMLM"] <- 0.00986727094112512
+se_mat["ethnicWhite", "bcMLM"] <- 0.0112654513646446
+se_mat["ethnicOther", "bcMLM"] <- 0.0287686568853934
+se_mat["frl", "bcMLM"] <- 0.00696191847178387
+se_mat["mathtestz", "bcMLM"] <- 0.00467984987268989
+se_mat["gpa11th", "bcMLM"] <- 0.00730562351751458
+se_mat["tookmath_schoolmean", "bcMLM"] <- 0.101647333449621
+se_mat["female_schoolmean", "bcMLM"] <- 0.182698571674334
+se_mat["ethnicBlack_schoolmean", "bcMLM"] <- 0.461496748024662
+se_mat["ethnicFilipinx_schoolmean", "bcMLM"] <- 0.630278931965201
+se_mat["ethnicLatinx_schoolmean", "bcMLM"] <- 0.315024624247154
+se_mat["ethnicWhite_schoolmean", "bcMLM"] <- 0.383500767070303
+se_mat["ethnicOther_schoolmean", "bcMLM"] <- 0.866975878631917
+se_mat["frl_schoolmean", "bcMLM"] <- 0.315958410502349
+se_mat["mathtestz_schoolmean", "bcMLM"] <- 0.203854057171661
+se_mat["gpa11th_schoolmean", "bcMLM"] <- 0.346272850807119
+
 coverage_mat <- (0 >= results-qnorm(0.975)*se_mat) & (0 <= results+qnorm(0.975)*se_mat)
 
 results <- round(results, 4)
@@ -459,7 +511,7 @@ for(i in 1:ncol(results)){
     ")",
     sep=""
   )
-  results[is.na(old_vec), i] <- NA
+  results[is.na(old_vec), i] <- ""
 }
 
 ccred_results <- results

@@ -210,6 +210,9 @@ bcmlm <- function(formula, data, family = NULL, inference = "default", B = 500, 
 
     # bootstrap
     for(b in 1:B){
+      # Get start time
+      start_time <- Sys.time()
+
       # Sample
       bsample_groups <- sort(sample(glevels, size=length(glevels), replace=T))
       data_boot <- NULL
@@ -242,6 +245,14 @@ bcmlm <- function(formula, data, family = NULL, inference = "default", B = 500, 
         names(temp) <- names(beta)
       }
       beta_boot <- rbind(beta_boot, temp)
+
+      # Get elapsed time
+      elapsed_time <- difftime(Sys.time(), start_time, units="secs")
+      elapsed_time <- round(elapsed_time, 3)
+
+      # Print bootstrap sample and time update
+      cat(paste0("Bootstrap Sample ", b, ": ", elapsed_time, " seconds", "\n"))
+
     }
 
     # Get variance and SE
