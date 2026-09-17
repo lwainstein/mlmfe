@@ -32,11 +32,11 @@ A list containing various results from the regularized fixed effects model.
 }
 \description{
 This function implements regularized-fixed effect multilevel models
-as described in \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2025)} and \href{https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980}{Hazlett and Wainstein (2022)}.
+as described in \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2026)} and \href{https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980}{Hazlett and Wainstein (2022)}.
 Optimization is done through iterative reweighted least squares. The function uses output from the
 \href{https://cran.r-project.org/web/packages/lme4/index.html}{\code{lme4}} package to estimate regularizing
 parameters and starting parameters for optimization. Cluster-robust standard errors are provided,
-as suggested by \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2025)}.
+as suggested by \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2026)}.
 
 Note: Currently, the \code{mlmfe} package only allows for two-level models.
 }

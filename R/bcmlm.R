@@ -2,7 +2,7 @@
 #' Bias-corrected multilevel models
 #'
 #' @description This function implements bias-corrected multilevel models
-#'  as described in [Bai et al. (2025)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980),
+#'  as described in [Bai et al. (2026)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980),
 #'  using the [`lme4`](https://cran.r-project.org/web/packages/lme4/index.html) package.
 #'
 #'  Note: Currently, the `mlmfe` package only allows for two-level models.

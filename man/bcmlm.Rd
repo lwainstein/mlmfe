@@ -28,7 +28,7 @@ A list containing various results from the bias-corrected multilevel model.
 }
 \description{
 This function implements bias-corrected multilevel models
-as described in \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2025)} and \href{https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980}{Hazlett and Wainstein (2022)},
+as described in \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2026)} and \href{https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980}{Hazlett and Wainstein (2022)},
 using the \href{https://cran.r-project.org/web/packages/lme4/index.html}{\code{lme4}} package.
 
 Note: Currently, the \code{mlmfe} package only allows for two-level models.

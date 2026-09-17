@@ -3,7 +3,7 @@
 #' This is a mock, simulated dataset for use with `mlmfe`.
 #' The `mockmath12th` dataset is completely simulated, but is based on the real data examined by [Wainstein et al. (2023a)](https://laeri.luskin.ucla.edu/12thgrademathandcollegeaccess/) and [Wainstein et al. (2023b)](https://laeri.luskin.ucla.edu/12thgrademathandcollegesuccess/),
 #' for the [Los Angeles Education Research Institute (LAERI)](https://laeri.luskin.ucla.edu/) at the University of California Los Angeles, who investigated the effects of taking math in 12th grade on end-of-high school and college outcomes in the Los Angeles Unified School District.
-#' This real data will be re-analyzed by [Bai et al. (2025)](https://arxiv.org/abs/2411.01723) in an upcoming version of their paper.
+#' This real data is re-analyzed by [Bai et al. (2026)](https://arxiv.org/abs/2411.01723) in their paper.
 #' One can see how the `mockmath12th` dataset was simulated by viewing the `mockmath12th.R` file in the `data-raw/` folder.
 #' Note that the simulated demographic variables (gender, race/ethnicity, and a free or reduced-price lunch indicator) were generated completely at random, and do NOT have any relationship
 #' with other variables in the data (e.g., the outcomes, math course-taking, school, or academic achievement). These demographic variables are included purely to simulate

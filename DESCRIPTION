@@ -3,7 +3,7 @@ Title: Bias-corrected Multilevel Models, Fixed Effects Models, and Regularized F
 Version: 0.0.0.9000
 Authors@R: 
     person("Leonard", "Wainstein", email = "lwainstein@reed.edu", role = c("aut", "cre"))
-Description: This package implements bias-corrected multilevel models, fixed effects models, and (bias-corrected) regularized fixed effects models, as described in Bai et al. (2025) and Hazlett and Wainstein (2022). 
+Description: This package implements bias-corrected multilevel models, fixed effects models, and (bias-corrected) regularized fixed effects models, as described in Bai et al. (2026) and Hazlett and Wainstein (2022). 
 License: GPL (>= 3)
 Imports: 
     lme4,

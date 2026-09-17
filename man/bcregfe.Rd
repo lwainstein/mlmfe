@@ -32,11 +32,11 @@ A list containing various results from the bias-corrected regularized fixed effe
 }
 \description{
 This function implements bias-corrected regularized-fixed effect multilevel models
-as described in \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2025)}.
+as described in \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2026)}.
 Optimization is done through iterative reweighted least squares. The function uses output from the
 \href{https://cran.r-project.org/web/packages/lme4/index.html}{\code{lme4}} package to estimate regularizing
 parameters and starting parameters for optimization. Cluster-robust standard errors are provided,
-as suggested by \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2025)}.
+as suggested by \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2026)}.
 
 Note: Currently, the \code{mlmfe} package only allows for two-level models.
 }

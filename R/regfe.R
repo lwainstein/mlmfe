@@ -2,11 +2,11 @@
 #' Regularized fixed-effects models
 #'
 #' @description This function implements regularized-fixed effect multilevel models
-#'  as described in [Bai et al. (2025)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980).
+#'  as described in [Bai et al. (2026)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980).
 #'  Optimization is done through iterative reweighted least squares. The function uses output from the
 #'  [`lme4`](https://cran.r-project.org/web/packages/lme4/index.html) package to estimate regularizing
 #'  parameters and starting parameters for optimization. Cluster-robust standard errors are provided,
-#'  as suggested by [Bai et al. (2025)](https://arxiv.org/abs/2411.01723).
+#'  as suggested by [Bai et al. (2026)](https://arxiv.org/abs/2411.01723).
 #'
 #'  Note: Currently, the `mlmfe` package only allows for two-level models.
 #'

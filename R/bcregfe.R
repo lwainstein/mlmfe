@@ -2,11 +2,11 @@
 #' Bias-corrected regularized fixed-effect models
 #'
 #' @description This function implements bias-corrected regularized-fixed effect multilevel models
-#'  as described in [Bai et al. (2025)](https://arxiv.org/abs/2411.01723).
+#'  as described in [Bai et al. (2026)](https://arxiv.org/abs/2411.01723).
 #'  Optimization is done through iterative reweighted least squares. The function uses output from the
 #'  [`lme4`](https://cran.r-project.org/web/packages/lme4/index.html) package to estimate regularizing
 #'  parameters and starting parameters for optimization. Cluster-robust standard errors are provided,
-#'  as suggested by [Bai et al. (2025)](https://arxiv.org/abs/2411.01723).
+#'  as suggested by [Bai et al. (2026)](https://arxiv.org/abs/2411.01723).
 #'
 #'  Note: Currently, the `mlmfe` package only allows for two-level models.
 #'

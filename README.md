@@ -10,7 +10,7 @@ Please contact Leonard Wainstein (<lwainstein@reed.edu>) with questions.
 The `mlmfe` package implements bias-corrected multilevel models (bcMLM),
 fixed effects models (FE), regularized fixed effects models (RegFE), and
 bias-corrected RegFE models (bcRegFE) as recommended by [Bai et
-al. (2025)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein
+al. (2026)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein
 (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980).
 
 To demonstrate the functions included in `mlmfe`, we provide the
@@ -25,10 +25,9 @@ for the [Los Angeles Education Research Institute
 (LAERI)](https://laeri.luskin.ucla.edu/) at the University of California
 Los Angeles, who investigated the effects of taking math in 12th grade
 on end-of-high school and college outcomes in the Los Angeles Unified
-School District. This real data will be re-analyzed by [Bai et
-al. (2025)](https://arxiv.org/abs/2411.01723) in an upcoming version of
-their paper, and this README is meant to replicate their re-analysis on
-simulated, mock data.
+School District. This real data is re-analyzed by [Bai et
+al. (2026)](https://arxiv.org/abs/2411.01723), and this README is meant
+to replicate their re-analysis on simulated, mock data.
 
 Finally, note that the `mlmfe` package **currently** only allows for
 two-level models.
@@ -162,7 +161,7 @@ for `bcmlm()` and `fe()`, and the `regression_type` argument for
 for different methods of estimating standard errors for the model, by
 specifying the `inference` argument. The `regfe()` and `bcregfe()`
 functions only allow for cluster-robust standard errors, as described in
-[Bai et al. (2025)](https://arxiv.org/abs/2411.01723).
+[Bai et al. (2026)](https://arxiv.org/abs/2411.01723).
 
 We demonstrate these functions below, but note that `help()` files are
 also available for these functions with:
@@ -315,7 +314,7 @@ comparison
 
 However, fitting the model by scratch is much more work! And this gets
 more complicated with more school-varying coefficients (see [Bai et
-al. (2025)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein
+al. (2026)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein
 (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980)).
 Meanwhile, with `bcmlm()`, these are automatically added. For example,
 the following function call creates a bcMLM with school-varying
@@ -354,7 +353,7 @@ bcmlm_model_slopes$coefficients
 
 Here, the added variables are the variables with the `_tilde` suffix,
 echoing the notation in [Bai et
-al. (2025)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein
+al. (2026)](https://arxiv.org/abs/2411.01723) and [Hazlett and Wainstein
 (2022)](https://www.cambridge.org/core/journals/political-analysis/article/understanding-choosing-and-unifying-multilevel-and-fixed-effect-approaches/8101D49CFD3B129F5753FC878F416980).
 
 Finally, as [Hazlett and Wainstein
@@ -654,7 +653,7 @@ characteristics and school.
 
 ## References
 
-Bai, H., Ferguson, A., Wainstein, L., & Wells, J. (2025). Comparing
+Bai, H., Ferguson, A., Wainstein, L., & Wells, J. (2026). Comparing
 multilevel and fixed effect approaches in the generalized linear model
 setting. *arXiv preprint arXiv:2411.01723*.
 

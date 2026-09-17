@@ -29,7 +29,7 @@ mockmath12th
 This is a mock, simulated dataset for use with \code{mlmfe}.
 The \code{mockmath12th} dataset is completely simulated, but is based on the real data examined by \href{https://laeri.luskin.ucla.edu/12thgrademathandcollegeaccess/}{Wainstein et al. (2023a)} and \href{https://laeri.luskin.ucla.edu/12thgrademathandcollegesuccess/}{Wainstein et al. (2023b)},
 for the \href{https://laeri.luskin.ucla.edu/}{Los Angeles Education Research Institute (LAERI)} at the University of California Los Angeles, who investigated the effects of taking math in 12th grade on end-of-high school and college outcomes in the Los Angeles Unified School District.
-This real data will be re-analyzed by \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2025)} in an upcoming version of their paper.
+This real data is re-analyzed by \href{https://arxiv.org/abs/2411.01723}{Bai et al. (2026)} in their paper.
 One can see how the \code{mockmath12th} dataset was simulated by viewing the \code{mockmath12th.R} file in the \verb{data-raw/} folder.
 Note that the simulated demographic variables (gender, race/ethnicity, and a free or reduced-price lunch indicator) were generated completely at random, and do NOT have any relationship
 with other variables in the data (e.g., the outcomes, math course-taking, school, or academic achievement). These demographic variables are included purely to simulate
